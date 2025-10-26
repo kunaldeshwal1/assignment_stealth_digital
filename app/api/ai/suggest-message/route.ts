@@ -51,11 +51,6 @@ export async function POST(request: NextRequest) {
 
     const { name, email, status, count } = validation.data;
 
-    // Log request for debugging
-    console.log(
-      `[AI Suggest] User: ${user.email}, Lead: ${name} (${email}), Status: ${status}`
-    );
-
     // Generate message(s)
     let message: string;
     let variations: string[] | undefined;

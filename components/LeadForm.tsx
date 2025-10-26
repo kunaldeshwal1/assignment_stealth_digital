@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useStore } from "@/store/useStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 
 interface LeadFormProps {
   onSuccess?: () => void;
@@ -14,21 +15,22 @@ interface LeadFormProps {
 export default function LeadForm({ onSuccess }: LeadFormProps) {
   const { addLead } = useStore();
 
-  // Typed state for form data
   const [formData, setFormData] = useState<{
     name: string;
     email: string;
     status: "new" | "contacted" | "qualified" | "lost";
+    aiMessage?: string;
   }>({
     name: "",
     email: "",
     status: "new",
   });
 
+  const [aiSuggested, setAiSuggested] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle form submission -> adds a new lead
+  // Handle new lead submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -50,6 +52,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
 
       addLead(data.data);
       setFormData({ name: "", email: "", status: "new" });
+      setAiSuggested(false);
       onSuccess?.();
     } catch (err) {
       console.error("Lead creation error:", err);
@@ -59,7 +62,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
     }
   };
 
-  // AI suggestion for follow-up message
+  // AI suggestion fetch
   const handleAISuggest = async () => {
     if (!formData.name || !formData.email) {
       setError("Please fill in name and email first");
@@ -78,8 +81,10 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
 
       const data = await response.json();
       if (data.success) {
-        // Instead of just alert, keep friendly info
-        alert(`AI Follow‑up Suggestion:\n\n${data.data.message}`);
+        const message = data.data.message;
+        // Display text area for the user to edit message
+        setFormData({ ...formData, aiMessage: message });
+        setAiSuggested(true);
       } else {
         setError(data.message || "Failed to generate AI suggestion");
       }
@@ -89,6 +94,11 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRemoveAISuggestion = () => {
+    setAiSuggested(false);
+    setFormData({ ...formData, aiMessage: undefined });
   };
 
   return (
@@ -158,7 +168,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
                     | "lost",
                 })
               }
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               disabled={loading}
             >
               <option value="new">New</option>
@@ -168,7 +178,37 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
             </select>
           </div>
 
-          {/* Buttons */}
+          {/* AI Follow-up suggestion field */}
+          {aiSuggested && (
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label
+                  htmlFor="aiMessage"
+                  className="block text-sm font-medium"
+                >
+                  AI Follow‑up Message
+                </label>
+                <button
+                  type="button"
+                  onClick={handleRemoveAISuggestion}
+                  className="text-xs text-red-500 hover:underline flex items-center"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Remove
+                </button>
+              </div>
+              <Textarea
+                id="aiMessage"
+                value={formData.aiMessage || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, aiMessage: e.target.value })
+                }
+                rows={4}
+                className="text-sm"
+              />
+            </div>
+          )}
+
           <div className="flex gap-2">
             <Button type="submit" disabled={loading} className="flex-1">
               {loading ? "Creating..." : "Add Lead"}
