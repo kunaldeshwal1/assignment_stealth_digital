@@ -1,15 +1,14 @@
 # 🚀 Mini SaaS Dashboard - AI-Enhanced Lead Tracker
 
-A modern, full-stack web application for managing leads with AI-powered features. Built with Next.js 14, MongoDB, and OpenAI.
+A modern, full-stack web application for managing leads with AI-powered features. Built with Next.js 14, MongoDB, and Groq.
 
 ## ✨ Features
 
 - 🔐 **Authentication**: Secure JWT-based authentication with signup/login
 - 📊 **Dashboard**: Real-time statistics and lead analytics
 - ✏️ **CRUD Operations**: Create, Read, Update, Delete leads
-- 🤖 **AI Integration**: AI-powered follow-up message suggestions using OpenAI
+- 🤖 **AI Integration**: AI-powered follow-up message suggestions using GROQ
 - 🔍 **Search & Filter**: Advanced lead filtering and search
-- 📱 **Responsive Design**: Mobile-first, works on all devices
 - 🎨 **Modern UI**: Built with Shadcn UI and Tailwind CSS
 - 🧪 **Testing**: Unit and integration tests included
 - 🚀 **Performance**: Optimistic UI updates with Zustand
@@ -31,13 +30,12 @@ A modern, full-stack web application for managing leads with AI-powered features
 - **Database**: MongoDB Atlas
 - **ODM**: Mongoose
 - **Authentication**: JWT + bcryptjs
-- **AI**: OpenAI GPT-3.5
+- **AI**: GROQ API
 
 ### Testing
 
 - **Framework**: Jest
 - **Testing Library**: React Testing Library
-- **E2E**: (Optional) Playwright
 
 ## 📦 Installation
 
@@ -45,11 +43,36 @@ A modern, full-stack web application for managing leads with AI-powered features
 
 - Node.js 18+ and npm
 - MongoDB Atlas account (free tier)
-- OpenAI API key (optional, for AI features)
+- GROQ API key (optional, for AI features)
 
-### Step 1: Clone the Repository
+### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mini-saas-dashboard.git
+git clone https://github.com/kunaldeshwal1/assignment_stealth_digital.git
 cd mini-saas-dashboard
+npm install
+```
+
+# MongoDB Connection
+
+MONGODB_URI=your_mongodb_connection_string
+
+# JWT Secret (use a strong random string)
+
+JWT_SECRET=your_jwt_secret_key_here
+
+# GROQ API Key (Optional - for AI features)
+
+GROQ_API_KEY=your_groq_api_key_here
+
+### Run
+
+```bash
+npm run dev
+```
+
+### Test
+
+```bash
+npm test
 ```
