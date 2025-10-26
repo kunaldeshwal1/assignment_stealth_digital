@@ -217,7 +217,10 @@ export default function LeadTable() {
                           className="h-9"
                         />
                       ) : (
-                        <div className="text-gray-600 text-sm break-all">
+                        <div
+                          className="text-gray-600 text-sm truncate max-w-[200px]"
+                          title={lead.email}
+                        >
                           {lead.email}
                         </div>
                       )}
@@ -251,7 +254,7 @@ export default function LeadTable() {
                       )}
                     </td>
 
-                    <td className="p-3 text-sm text-gray-500">
+                    <td className="p-3 text-sm text-gray-500 whitespace-nowrap">
                       {formatDate(lead.createdAt)}
                     </td>
 

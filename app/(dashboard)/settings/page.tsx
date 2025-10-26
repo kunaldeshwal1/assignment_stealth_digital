@@ -1,11 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useStore } from "@/store/useStore";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -13,32 +10,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { User, Mail, Shield } from "lucide-react";
+import { User, Mail, Shield, Calendar } from "lucide-react";
 
 export default function SettingsPage() {
   const { user } = useStore();
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-
-    try {
-      // This would be an API call to update user settings
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setMessage("Settings updated successfully");
-    } catch (error) {
-      setMessage("Failed to update settings");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <ProtectedRoute>
@@ -48,7 +23,7 @@ export default function SettingsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
             <p className="text-gray-600 mt-1">
-              Manage your account settings and preferences
+              View your account information and preferences
             </p>
           </div>
 
@@ -59,55 +34,38 @@ export default function SettingsPage() {
                   <User className="h-5 w-5 mr-2" />
                   Profile Information
                 </CardTitle>
-                <CardDescription>
-                  Update your personal information
-                </CardDescription>
+                <CardDescription>Your personal information</CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {message && (
-                    <div
-                      className={`p-3 text-sm rounded-md ${
-                        message.includes("success")
-                          ? "bg-green-50 text-green-600"
-                          : "bg-red-50 text-red-600"
-                      }`}
-                    >
-                      {message}
-                    </div>
-                  )}
-
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center py-3 border-b">
                   <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Name
-                    </label>
-                    <Input
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="Your name"
-                    />
+                    <p className="text-sm font-medium text-gray-500">Name</p>
+                    <p className="text-base font-semibold text-gray-900 mt-1">
+                      {user?.name || "Not set"}
+                    </p>
                   </div>
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
 
+                <div className="flex justify-between items-center py-3 border-b">
                   <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Email
-                    </label>
-                    <Input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      placeholder="your@email.com"
-                    />
+                    <p className="text-sm font-medium text-gray-500">Email</p>
+                    <p className="text-base font-semibold text-gray-900 mt-1">
+                      {user?.email || "Not set"}
+                    </p>
                   </div>
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
 
-                  <Button type="submit" disabled={loading}>
-                    {loading ? "Saving..." : "Save Changes"}
-                  </Button>
-                </form>
+                <div className="flex justify-between items-center py-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">User ID</p>
+                    <p className="text-base font-mono text-gray-700 mt-1 text-sm">
+                      {user?._id || "N/A"}
+                    </p>
+                  </div>
+                  <Shield className="h-5 w-5 text-gray-400" />
+                </div>
               </CardContent>
             </Card>
 
@@ -117,47 +75,58 @@ export default function SettingsPage() {
                   <Shield className="h-5 w-5 mr-2" />
                   Account Information
                 </CardTitle>
-                <CardDescription>Your account details</CardDescription>
+                <CardDescription>
+                  Your account details and status
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b">
                   <div>
-                    <p className="text-sm font-medium">Role</p>
-                    <p className="text-sm text-gray-500">{user?.role}</p>
+                    <p className="text-sm font-medium text-gray-500">Role</p>
+                    <p className="text-base font-semibold text-gray-900 mt-1">
+                      {user?.role || "User"}
+                    </p>
                   </div>
                   <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                    {user?.role}
+                    {user?.role || "User"}
                   </span>
                 </div>
+
                 <div className="flex justify-between items-center py-3 border-b">
                   <div>
-                    <p className="text-sm font-medium">Account Status</p>
-                    <p className="text-sm text-gray-500">Active</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Account Status
+                    </p>
+                    <p className="text-base font-semibold text-gray-900 mt-1">
+                      Active
+                    </p>
                   </div>
                   <span className="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
                     Active
                   </span>
                 </div>
+
                 <div className="flex justify-between items-center py-3">
                   <div>
-                    <p className="text-sm font-medium">Member Since</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(user?.createdAt || "").toLocaleDateString()}
+                    <p className="text-sm font-medium text-gray-500">
+                      Member Since
+                    </p>
+                    <p className="text-base font-semibold text-gray-900 mt-1">
+                      {user?.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : new Date().toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                     </p>
                   </div>
+                  <Calendar className="h-5 w-5 text-gray-400" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-red-600">Danger Zone</CardTitle>
-                <CardDescription>
-                  Irreversible actions for your account
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="destructive">Delete Account</Button>
               </CardContent>
             </Card>
           </div>
