@@ -10,7 +10,7 @@ const customJestConfig = {
   transform: {
     "^.+\\.(ts|tsx)$": "babel-jest",
   },
-  transformIgnorePatterns: [],
+  transformIgnorePatterns: ["node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)"],
   watchman: false,
 };
 

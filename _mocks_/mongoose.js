@@ -1,13 +1,10 @@
 // __mocks__/mongoose.js
 module.exports = {
-  Schema: class {
-    constructor() {}
-    static Types = { ObjectId: {} };
-  },
+  Schema: class {},
   model: () => ({}),
   models: {},
-  connect: jest.fn(),
+  connect: jest.fn(() => Promise.resolve()),
   connection: { readyState: 1 },
-  Types: { ObjectId: {} },
+  Types: { ObjectId: jest.fn() },
   default: {},
 };
