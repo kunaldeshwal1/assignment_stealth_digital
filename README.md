@@ -53,17 +53,13 @@ cd mini-saas-dashboard
 npm install
 ```
 
-# MongoDB Connection
+### MongoDB, JWT Secret, and GROQ API Key
 
+```
 MONGODB_URI=your_mongodb_connection_string
-
-# JWT Secret (use a strong random string)
-
 JWT_SECRET=your_jwt_secret_key_here
-
-# GROQ API Key (Optional - for AI features)
-
 GROQ_API_KEY=your_groq_api_key_here
+```
 
 ### Run
 
