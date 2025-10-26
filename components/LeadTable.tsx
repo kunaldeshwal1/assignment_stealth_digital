@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Pencil, Trash2, Sparkles } from "lucide-react";
+import { Search, Pencil, Trash2, Sparkles, Mail } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { Lead } from "@/types"; // Add this import
+import { Lead } from "@/types";
 
 export default function LeadTable() {
   const {
@@ -22,8 +22,6 @@ export default function LeadTable() {
   } = useStore();
 
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // FIX: Use the proper type for status
   const [editForm, setEditForm] = useState<{
     name: string;
     email: string;
@@ -31,9 +29,8 @@ export default function LeadTable() {
   }>({
     name: "",
     email: "",
-    status: "new", // Give it a default value
+    status: "new",
   });
-
   const [loadingAI, setLoadingAI] = useState<string | null>(null);
 
   // Filter leads based on search and status
@@ -47,7 +44,6 @@ export default function LeadTable() {
   });
 
   const handleEdit = (lead: Lead) => {
-    // Use Lead type instead of any
     setEditingId(lead._id);
     setEditForm({
       name: lead.name,
@@ -66,7 +62,7 @@ export default function LeadTable() {
 
       const data = await response.json();
       if (data.success) {
-        updateLead(id, editForm); // This will now work correctly
+        updateLead(id, editForm);
         setEditingId(null);
       } else {
         alert(data.message || "Failed to update lead");
@@ -81,10 +77,7 @@ export default function LeadTable() {
     if (!confirm("Are you sure you want to delete this lead?")) return;
 
     try {
-      const response = await fetch(`/api/leads/${id}`, {
-        method: "DELETE",
-      });
-
+      const response = await fetch(`/api/leads/${id}`, { method: "DELETE" });
       const data = await response.json();
       if (data.success) {
         deleteLead(id);
@@ -98,7 +91,6 @@ export default function LeadTable() {
   };
 
   const handleAISuggest = async (lead: Lead) => {
-    // Use Lead type instead of any
     setLoadingAI(lead._id);
     try {
       const response = await fetch("/api/ai/suggest-message", {
@@ -113,16 +105,14 @@ export default function LeadTable() {
 
       const data = await response.json();
       if (data.success) {
-        alert(`AI Follow-up Message:\n\n${data.data.message}`);
-
-        // Optionally save the message to the lead
+        const message = data.data.message;
+        // Update in DB & Zustand
         await fetch(`/api/leads/${lead._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ aiMessage: data.data.message }),
+          body: JSON.stringify({ aiMessage: message }),
         });
-
-        updateLead(lead._id, { aiMessage: data.data.message });
+        updateLead(lead._id, { aiMessage: message });
       } else {
         alert(data.message || "Failed to generate AI message");
       }
@@ -176,6 +166,7 @@ export default function LeadTable() {
           </select>
         </div>
       </CardHeader>
+
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -188,6 +179,7 @@ export default function LeadTable() {
                 <th className="text-left p-3 font-medium">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {filteredLeads.length === 0 ? (
                 <tr>
@@ -213,6 +205,7 @@ export default function LeadTable() {
                         <div className="font-medium">{lead.name}</div>
                       )}
                     </td>
+
                     <td className="p-3">
                       {editingId === lead._id ? (
                         <Input
@@ -226,6 +219,7 @@ export default function LeadTable() {
                         <div className="text-gray-600">{lead.email}</div>
                       )}
                     </td>
+
                     <td className="p-3">
                       {editingId === lead._id ? (
                         <select
@@ -237,7 +231,7 @@ export default function LeadTable() {
                                 | "new"
                                 | "contacted"
                                 | "qualified"
-                                | "lost", // Type assertion
+                                | "lost",
                             })
                           }
                           className="h-8 rounded-md border border-input bg-background px-2 text-sm"
@@ -253,10 +247,12 @@ export default function LeadTable() {
                         </Badge>
                       )}
                     </td>
+
                     <td className="p-3 text-sm text-gray-500">
                       {formatDate(lead.createdAt)}
                     </td>
-                    <td className="p-3">
+
+                    <td className="p-3 align-top">
                       <div className="flex gap-2">
                         {editingId === lead._id ? (
                           <>
@@ -309,6 +305,48 @@ export default function LeadTable() {
                           </>
                         )}
                       </div>
+
+                      {/* 👇 AI message display */}
+                      {lead.aiMessage && (
+                        <div className="mt-3 rounded-md border bg-muted/40 p-2 text-sm">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-gray-700">
+                              AI Follow‑up
+                            </span>
+                            <div className="flex gap-2">
+                              <button
+                                className="text-xs text-blue-600 hover:underline"
+                                onClick={() =>
+                                  navigator.clipboard.writeText(
+                                    lead.aiMessage || ""
+                                  )
+                                }
+                              >
+                                Copy
+                              </button>
+                              <button
+                                className="text-xs text-green-600 hover:underline flex items-center gap-1"
+                                onClick={() =>
+                                  window.open(
+                                    `mailto:${
+                                      lead.email
+                                    }?subject=Follow-up&body=${encodeURIComponent(
+                                      lead.aiMessage || ""
+                                    )}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                <Mail className="h-3 w-3" /> Email
+                              </button>
+                            </div>
+                          </div>
+
+                          <p className="whitespace-pre-wrap text-gray-700">
+                            {lead.aiMessage}
+                          </p>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -317,7 +355,7 @@ export default function LeadTable() {
           </table>
         </div>
 
-        {/* Mobile-friendly card view for small screens */}
+        {/* Mobile-friendly card view */}
         <div className="md:hidden mt-4 space-y-4">
           {filteredLeads.map((lead) => (
             <Card key={lead._id}>
@@ -334,7 +372,7 @@ export default function LeadTable() {
                 <p className="text-xs text-gray-500 mb-3">
                   Created: {formatDate(lead.createdAt)}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     size="sm"
                     variant="outline"
@@ -359,8 +397,31 @@ export default function LeadTable() {
                     className="text-red-600"
                   >
                     <Trash2 className="h-3 w-3" />
+                    Delete
                   </Button>
                 </div>
+
+                {/* Mobile AI message display */}
+                {lead.aiMessage && (
+                  <div className="mt-3 rounded-md border bg-muted/40 p-2 text-sm">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-gray-700">
+                        AI Follow‑up
+                      </span>
+                      <button
+                        className="text-xs text-blue-600 hover:underline"
+                        onClick={() =>
+                          navigator.clipboard.writeText(lead.aiMessage || "")
+                        }
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="whitespace-pre-wrap text-gray-700">
+                      {lead.aiMessage}
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
