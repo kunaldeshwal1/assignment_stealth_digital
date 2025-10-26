@@ -14,7 +14,7 @@ interface LeadFormProps {
 export default function LeadForm({ onSuccess }: LeadFormProps) {
   const { addLead } = useStore();
 
-  // FIX: Properly type the status field
+  // Typed state for form data
   const [formData, setFormData] = useState<{
     name: string;
     email: string;
@@ -28,6 +28,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Handle form submission -> adds a new lead
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -46,17 +47,19 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
         setError(data.message);
         return;
       }
-      console.log("lead added successfully");
+
       addLead(data.data);
       setFormData({ name: "", email: "", status: "new" });
       onSuccess?.();
     } catch (err) {
+      console.error("Lead creation error:", err);
       setError("Failed to create lead");
     } finally {
       setLoading(false);
     }
   };
 
+  // AI suggestion for follow-up message
   const handleAISuggest = async () => {
     if (!formData.name || !formData.email) {
       setError("Please fill in name and email first");
@@ -75,7 +78,8 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
 
       const data = await response.json();
       if (data.success) {
-        alert(`AI Suggestion:\n\n${data.data.message}`);
+        // Instead of just alert, keep friendly info
+        alert(`AI Follow‑up Suggestion:\n\n${data.data.message}`);
       } else {
         setError(data.message || "Failed to generate AI suggestion");
       }
@@ -92,6 +96,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
       <CardHeader>
         <CardTitle>Add New Lead</CardTitle>
       </CardHeader>
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -100,9 +105,13 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
             </div>
           )}
 
+          {/* Name field */}
           <div>
-            <label className="block text-sm font-medium mb-2">Name</label>
+            <label htmlFor="name" className="block text-sm font-medium mb-2">
+              Name
+            </label>
             <Input
+              id="name"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -113,9 +122,13 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
             />
           </div>
 
+          {/* Email field */}
           <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium mb-2">
+              Email
+            </label>
             <Input
+              id="email"
               type="email"
               value={formData.email}
               onChange={(e) =>
@@ -127,9 +140,13 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
             />
           </div>
 
+          {/* Status dropdown */}
           <div>
-            <label className="block text-sm font-medium mb-2">Status</label>
+            <label htmlFor="status" className="block text-sm font-medium mb-2">
+              Status
+            </label>
             <select
+              id="status"
               value={formData.status}
               onChange={(e) =>
                 setFormData({
@@ -138,7 +155,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
                     | "new"
                     | "contacted"
                     | "qualified"
-                    | "lost", // Type assertion
+                    | "lost",
                 })
               }
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -151,6 +168,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
             </select>
           </div>
 
+          {/* Buttons */}
           <div className="flex gap-2">
             <Button type="submit" disabled={loading} className="flex-1">
               {loading ? "Creating..." : "Add Lead"}
