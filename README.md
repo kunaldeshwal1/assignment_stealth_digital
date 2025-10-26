@@ -1,6 +1,13 @@
 # 🚀 Mini SaaS Dashboard - AI-Enhanced Lead Tracker
 
-A modern, full-stack web application for managing leads with AI-powered features. Built with Next.js 14, MongoDB, and Groq.
+## Url
+
+https://assignment-stealth-digital.vercel.app/
+
+## Demo User
+
+- Email: test@gmail.com
+- Password: Test@123
 
 ## ✨ Features
 
