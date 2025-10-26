@@ -46,7 +46,7 @@ export default function LeadForm({ onSuccess }: LeadFormProps) {
         setError(data.message);
         return;
       }
-
+      console.log("lead added successfully");
       addLead(data.data);
       setFormData({ name: "", email: "", status: "new" });
       onSuccess?.();
